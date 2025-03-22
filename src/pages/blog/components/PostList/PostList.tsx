@@ -2,12 +2,29 @@ import { useDispatch, useSelector } from "react-redux";
 import PostItem from "../PostItem";
 import { RootState } from "../../../../store";
 import { deletePost, startEditingPost } from "../../blog.slice";
+import http from "../../../../utils/http";
+import { useEffect } from "react";
+
+/**
+ * B1: Gọi API trong useEffect
+ * B2: nếu gọi thành công thì dispatch action type: "blog/getPostListSuccess"
+ *     nếu gọi thất bại thì dispatch action type: "blog/getPostListFailed"
+ *
+ */
 
 export default function PostList() {
     // useSelector là một hook của react-redux, được sử dụng để lấy dữ liệu từ Redux store trong một functional component của React.
     //lấy dữ liệu để hiển thị lên UI
     const postList = useSelector((state: RootState) => state.blog.postList);
     const dispatch = useDispatch();
+
+    //Gọi API trong useEffect
+    useEffect(() => {
+        http.get("posts").then((response) => {
+            console.log(response);
+        });
+    }, []);
+
     const handleDelete = (postId: string) => {
         dispatch(deletePost(postId));
     };
