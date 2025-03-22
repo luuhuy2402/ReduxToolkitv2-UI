@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE simplemind-mindmaps>
+<simplemind-mindmaps generator="SimpleMindWin32" gen-version="1.15.0" doc-version="3">
+<mindmap>
+<meta>
+<guid guid="CE597C9E79954378A997ADB52F024176"/>
+<title text="Create Async Thunk"/>
+<style key="system.bright-palette"/>
+<auto-numbering style="disabled"/>
+<scrollstate zoom="90" x="398" y="332"/>
+<selection guid="QJLPD3gB9EixAOjGSwyniQ" type="node" id="0"/>
+<main-centraltheme id="0"/>
+</meta>
+<topics>
+<topic id="0" parent="-1" guid="QJLPD3gB9EixAOjGSwyniQ" x="800.00" y="800.00" layout="strict-horizontal" palette="1" colorinfo="1" text="Create Async Thunk"/>
+</topics>
+<relations/>
+</mindmap>
+</simplemind-mindmaps>

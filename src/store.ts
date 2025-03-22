@@ -3,6 +3,7 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import blogReducer from "./pages/blog/blog.slice";
+import { useDispatch } from "react-redux";
 
 export const store = configureStore({
     reducer: { blog: blogReducer },
@@ -22,3 +23,6 @@ export type RootState = ReturnType<typeof store.getState>;
  * Việc định nghĩa AppDispatch giúp TypeScript kiểm tra kiểu dữ liệu của các action khi dispatch.
  */
 export type AppDispatch = typeof store.dispatch;
+
+//Sử dụng ko dispatch một asynthunk
+export const useAppDispatch = () => useDispatch<AppDispatch>();

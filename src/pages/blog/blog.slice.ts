@@ -1,6 +1,13 @@
-import { createSlice, current, nanoid, PayloadAction } from "@reduxjs/toolkit";
+import {
+    createAsyncThunk,
+    createSlice,
+    current,
+    nanoid,
+    PayloadAction,
+} from "@reduxjs/toolkit";
 import { Post } from "../../types/blog.type";
-import { initalPostList } from "../../constants/blog";
+// import { initalPostList } from "../../constants/blog";
+import http from "../../utils/http";
 
 interface BlogState {
     postList: Post[];
@@ -11,6 +18,16 @@ const initialState: BlogState = {
     postList: [],
     editingPost: null,
 };
+
+export const getPostList = createAsyncThunk(
+    "blog/getPostList",
+    async (_, thunkAPI) => {
+        const response = await http.get<Post[]>("posts", {
+            signal: thunkAPI.signal,
+        });
+        return response.data;
+    }
+);
 
 const blogSlice = createSlice({
     name: "blog", // Đây là prefix cho action type
@@ -63,7 +80,7 @@ const blogSlice = createSlice({
     },
     extraReducers(builder) {
         builder
-            .addCase("blog/getPostListSuccess", (state, action: any) => {
+            .addCase(getPostList.fulfilled, (state, action) => {
                 state.postList = action.payload;
             })
             .addMatcher(

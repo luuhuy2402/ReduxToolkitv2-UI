@@ -1,8 +1,8 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import PostItem from "../PostItem";
-import { RootState } from "../../../../store";
-import { deletePost, startEditingPost } from "../../blog.slice";
-import http from "../../../../utils/http";
+import { RootState, useAppDispatch } from "../../../../store";
+import { deletePost, getPostList, startEditingPost } from "../../blog.slice";
+// import http from "../../../../utils/http";
 import { useEffect } from "react";
 
 /**
@@ -16,30 +16,38 @@ export default function PostList() {
     // useSelector là một hook của react-redux, được sử dụng để lấy dữ liệu từ Redux store trong một functional component của React.
     //lấy dữ liệu để hiển thị lên UI
     const postList = useSelector((state: RootState) => state.blog.postList);
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     //Gọi API trong useEffect
+    //Ko sử dụng asynthunk
+    // useEffect(() => {
+    //     const controller = new AbortController();
+    //     http.get("posts", { signal: controller.signal })
+    //         .then((response) => {
+    //             const postsListResult = response.data;
+    //             dispatch({
+    //                 type: "blog/getPostListSuccess",
+    //                 payload: postsListResult,
+    //             });
+    //         })
+    //         .catch((error) => {
+    //             //Nếu lỗi không phải do cancel request bởi abort thì mới dispatch action
+    //             if (!(error.code === "ERR_CANCELED")) {
+    //                 dispatch({
+    //                     type: "blog/getPostListFailed",
+    //                     payload: error,
+    //                 });
+    //             }
+    //         });
+    //     return () => {
+    //         controller.abort();
+    //     };
+    // }, [dispatch]);
+
     useEffect(() => {
-        const controller = new AbortController();
-        http.get("posts", { signal: controller.signal })
-            .then((response) => {
-                const postsListResult = response.data;
-                dispatch({
-                    type: "blog/getPostListSuccess",
-                    payload: postsListResult,
-                });
-            })
-            .catch((error) => {
-                //Nếu lỗi không phải do cancel request bởi abort thì mới dispatch action
-                if (!(error.code === "ERR_CANCELED")) {
-                    dispatch({
-                        type: "blog/getPostListFailed",
-                        payload: error,
-                    });
-                }
-            });
+        const promise = dispatch(getPostList());
         return () => {
-            controller.abort();
+            promise.abort();
         };
     }, [dispatch]);
 
