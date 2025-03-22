@@ -23,19 +23,25 @@ export default function PostList() {
         const controller = new AbortController();
         http.get("posts", { signal: controller.signal })
             .then((response) => {
-                console.log(response);
+                const postsListResult = response.data;
+                dispatch({
+                    type: "blog/getPostListSuccess",
+                    payload: postsListResult,
+                });
             })
             .catch((error) => {
-                if (error.name === "CanceledError") {
-                    console.log("Request was canceled:", error.message);
-                } else {
-                    console.error("API Error:", error);
+                //Nếu lỗi không phải do cancel request bởi abort thì mới dispatch action
+                if (!(error.code === "ERR_CANCELED")) {
+                    dispatch({
+                        type: "blog/getPostListFailed",
+                        payload: error,
+                    });
                 }
             });
         return () => {
             controller.abort();
         };
-    }, []);
+    }, [dispatch]);
 
     const handleDelete = (postId: string) => {
         dispatch(deletePost(postId));

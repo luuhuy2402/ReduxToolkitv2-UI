@@ -8,7 +8,7 @@ interface BlogState {
 }
 const initialState: BlogState = {
     //khởi tạo state
-    postList: initalPostList,
+    postList: [],
     editingPost: null,
 };
 
@@ -63,12 +63,16 @@ const blogSlice = createSlice({
     },
     extraReducers(builder) {
         builder
+            .addCase("blog/getPostListSuccess", (state, action: any) => {
+                state.postList = action.payload;
+            })
             .addMatcher(
                 (action) => action.type.includes("cancel"), //nếu trả về true thì hàm sau sẽ chạy
                 (state) => {
                     console.log(current(state));
                 }
             )
+
             .addDefaultCase((state) => {
                 console.log(state);
             });
