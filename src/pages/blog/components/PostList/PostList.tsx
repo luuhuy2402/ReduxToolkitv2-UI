@@ -20,9 +20,21 @@ export default function PostList() {
 
     //Gọi API trong useEffect
     useEffect(() => {
-        http.get("posts").then((response) => {
-            console.log(response);
-        });
+        const controller = new AbortController();
+        http.get("posts", { signal: controller.signal })
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                if (error.name === "CanceledError") {
+                    console.log("Request was canceled:", error.message);
+                } else {
+                    console.error("API Error:", error);
+                }
+            });
+        return () => {
+            controller.abort();
+        };
     }, []);
 
     const handleDelete = (postId: string) => {
