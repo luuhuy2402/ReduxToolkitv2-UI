@@ -7,12 +7,17 @@
 <title text="Create Async Thunk"/>
 <style key="system.bright-palette"/>
 <auto-numbering style="disabled"/>
-<scrollstate zoom="90" x="398" y="332"/>
-<selection guid="QJLPD3gB9EixAOjGSwyniQ" type="node" id="0"/>
+<scrollstate zoom="90" x="-47" y="332"/>
+<selection guid="Q_C3RUMkGUm3uaAZGIQgNQ" type="node" id="3"/>
 <main-centraltheme id="0"/>
 </meta>
 <topics>
 <topic id="0" parent="-1" guid="QJLPD3gB9EixAOjGSwyniQ" x="800.00" y="800.00" layout="strict-horizontal" palette="1" colorinfo="1" text="Create Async Thunk"/>
+<topic id="1" parent="0" guid="agWDKkYFBUGNlwxvABexMg" x="1184.44" y="800.00" palette="2" colorinfo="2" text="createAsyncThunk là một hàm trong Redux Toolkit\N(RTK) dùng để tạo action bất đồng bộ trong Redux. Nó\Ngiúp xử lý các tác vụ như gọi API"/>
+<topic id="2" parent="0" guid="e6WGewOwekSw46bOfVdO5A" x="546.06" y="800.00" palette="3" colorinfo="3" text="Cách hoạt động của\NcreateAsyncThunk"/>
+<topic id="3" parent="2" guid="Q_C3RUMkGUm3uaAZGIQgNQ" x="191.00" y="800.00" text="Khi gọi một API, createAsyncThunk tự động tạo ra 3 trạng thái:\N\Npending – Khi bắt đầu gọi API.\N\Nfulfilled – Khi API trả về dữ liệu thành công.\N\Nrejected – Khi API trả về lỗi.">
+<style align="left"/>
+</topic>
 </topics>
 <relations/>
 </mindmap>
