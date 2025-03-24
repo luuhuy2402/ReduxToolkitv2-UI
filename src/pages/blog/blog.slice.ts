@@ -50,19 +50,20 @@ export const updatePost = createAsyncThunk(
         return response.data;
     }
 );
+
+export const deletePost = createAsyncThunk(
+    "blog/deletePost",
+    async (postId: string, thunkAPI) => {
+        const response = await http.delete<string>(`posts/${postId}`, {
+            signal: thunkAPI.signal,
+        });
+        return response.data;
+    }
+);
 const blogSlice = createSlice({
     name: "blog", // Đây là prefix cho action type
     initialState,
     reducers: {
-        deletePost: (state, action: PayloadAction<string>) => {
-            const postId = action.payload;
-            const foundPostIndex = state.postList.findIndex(
-                (post) => post.id === postId
-            );
-            if (foundPostIndex !== -1) {
-                state.postList.splice(foundPostIndex, 1);
-            }
-        },
         startEditingPost: (state, action: PayloadAction<string>) => {
             const postId = action.payload;
             const foundPost =
@@ -73,17 +74,6 @@ const blogSlice = createSlice({
         cancelEditingPost: (state) => {
             state.editingPost = null;
         },
-        // finishEditingPost: (state, action: PayloadAction<Post>) => {
-        //     const postId = action.payload.id;
-        //     state.postList.some((post, index) => {
-        //         if (post.id === postId) {
-        //             state.postList[index] = action.payload;
-        //             return true; //Dừng lại ngay nếu đã cập nhật
-        //         }
-        //         return false;
-        //     });
-        //     state.editingPost = null;
-        // },
     },
     extraReducers(builder) {
         builder
@@ -104,6 +94,16 @@ const blogSlice = createSlice({
                 });
                 state.editingPost = null;
             })
+            .addCase(deletePost.fulfilled, (state, action) => {
+                //vì khi gọi api delete thì server sẽ trả về 1 thông báo hoặc {} nên ta ko lất action.payload được
+                const postId = action.meta.arg;
+                const deletePostIndex = state.postList.findIndex(
+                    (post) => post.id === postId
+                );
+                if (deletePostIndex !== -1) {
+                    state.postList.splice(deletePostIndex, 1);
+                }
+            })
             .addMatcher(
                 (action) => action.type.includes("cancel"), //nếu trả về true thì hàm sau sẽ chạy
                 (state) => {
@@ -118,12 +118,7 @@ const blogSlice = createSlice({
 });
 
 // export action được generate ra từ slice
-export const {
-    cancelEditingPost,
-    deletePost,
-    // finishEditingPost,
-    startEditingPost,
-} = blogSlice.actions;
+export const { cancelEditingPost, startEditingPost } = blogSlice.actions;
 
 // export reducer được generate ra từ slice
 const blogReducer = blogSlice.reducer;

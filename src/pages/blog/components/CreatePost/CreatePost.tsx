@@ -39,6 +39,7 @@ export default function CreatePost() {
         if (editingPost) {
             dispatch(updatePost({ postId: editingPost.id, body: formData }));
         } else {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { id, ...postData } = formData;
             dispatch(addPost(postData));
         }
