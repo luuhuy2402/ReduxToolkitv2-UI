@@ -20,6 +20,7 @@ const initialState: Post = {
 export default function CreatePost() {
     const [formData, setFormData] = useState<Post>(initialState);
     const dispatch = useAppDispatch();
+    const loading = useSelector((state: RootState) => state.blog.loading);
     //Edit post
     //Lấy dữ liệu
     const editingPost = useSelector(

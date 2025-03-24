@@ -1,21 +1,30 @@
 import {
+    AsyncThunk,
     createAsyncThunk,
     createSlice,
-    current,
     PayloadAction,
 } from "@reduxjs/toolkit";
 import { Post } from "../../types/blog.type";
 // import { initalPostList } from "../../constants/blog";
 import http from "../../utils/http";
 
+type GenericAsyncThunk = AsyncThunk<unknown, unknown, any>;
+
+type PendingAction = ReturnType<GenericAsyncThunk["pending"]>;
+type RejectedAction = ReturnType<GenericAsyncThunk["rejected"]>;
+type FulfilledAction = ReturnType<GenericAsyncThunk["fulfilled"]>;
 interface BlogState {
     postList: Post[];
     editingPost: Post | null;
+    loading: boolean;
+    currentRequestId: undefined | string;
 }
 const initialState: BlogState = {
     //khởi tạo state
     postList: [],
     editingPost: null,
+    loading: false,
+    currentRequestId: undefined,
 };
 
 export const getPostList = createAsyncThunk(
@@ -104,13 +113,41 @@ const blogSlice = createSlice({
                     state.postList.splice(deletePostIndex, 1);
                 }
             })
-            .addMatcher(
-                (action) => action.type.includes("cancel"), //nếu trả về true thì hàm sau sẽ chạy
-                (state) => {
-                    console.log(current(state));
+            .addMatcher<PendingAction>(
+                (action) => action.type.endsWith("/pending"),
+                (state, action) => {
+                    state.loading = true;
+                    //Khi gọi api bất kì thì createAsyncThunk sẽ tự sinh ra requestId
+                    state.currentRequestId = action.meta.requestId;
                 }
             )
 
+            .addMatcher<RejectedAction | FulfilledAction>(
+                (action) =>
+                    action.type.endsWith("/rejected") ||
+                    action.type.endsWith("/fulfilled"),
+                (state, action) => {
+                    if (
+                        state.loading &&
+                        state.currentRequestId === action.meta.requestId
+                    ) {
+                        state.loading = false;
+                        state.currentRequestId = undefined;
+                    }
+                }
+            )
+            // .addMatcher<FulfilledAction>(
+            //     (action) => action.type.endsWith("/fulfilled"),
+            //     (state, action) => {
+            //         if (
+            //             state.loading &&
+            //             state.currentRequestId === action.meta.requestId
+            //         ) {
+            //             state.loading = false;
+            //             state.currentRequestId = undefined;
+            //         }
+            //     }
+            // )
             .addDefaultCase((state) => {
                 console.log(state);
             });

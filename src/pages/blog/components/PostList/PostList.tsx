@@ -4,6 +4,7 @@ import { RootState, useAppDispatch } from "../../../../store";
 import { deletePost, getPostList, startEditingPost } from "../../blog.slice";
 // import http from "../../../../utils/http";
 import { useEffect } from "react";
+import SkeletonPost from "../SkeletonPost";
 
 /**
  * B1: Gọi API trong useEffect
@@ -16,6 +17,8 @@ export default function PostList() {
     // useSelector là một hook của react-redux, được sử dụng để lấy dữ liệu từ Redux store trong một functional component của React.
     //lấy dữ liệu để hiển thị lên UI
     const postList = useSelector((state: RootState) => state.blog.postList);
+    const loading = useSelector((state: RootState) => state.blog.loading);
+
     const dispatch = useAppDispatch();
 
     //Gọi API trong useEffect
@@ -71,14 +74,21 @@ export default function PostList() {
                     </p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-2 xl:grid-cols-2 xl:gap-8">
-                    {postList.map((post) => (
-                        <PostItem
-                            post={post}
-                            key={post.id}
-                            handleDelete={handleDelete}
-                            handleStartEditing={handleStartEditing}
-                        />
-                    ))}
+                    {loading && (
+                        <>
+                            <SkeletonPost />
+                            <SkeletonPost />
+                        </>
+                    )}
+                    {!loading &&
+                        postList.map((post) => (
+                            <PostItem
+                                post={post}
+                                key={post.id}
+                                handleDelete={handleDelete}
+                                handleStartEditing={handleStartEditing}
+                            />
+                        ))}
                 </div>
             </div>
         </div>
