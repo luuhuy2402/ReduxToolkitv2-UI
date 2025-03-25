@@ -8,6 +8,7 @@ import { Post } from "../../types/blog.type";
 // import { initalPostList } from "../../constants/blog";
 import http from "../../utils/http";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GenericAsyncThunk = AsyncThunk<unknown, unknown, any>;
 
 type PendingAction = ReturnType<GenericAsyncThunk["pending"]>;
@@ -42,10 +43,17 @@ export const addPost = createAsyncThunk(
     //thêm post mới thì cần truyền lên bài post đó (body)
     // id thì json-server sẽ tự sinh ra
     async (body: Omit<Post, "id">, thunkAPI) => {
-        const response = await http.post<Post>("posts", body, {
-            signal: thunkAPI.signal,
-        });
-        return response.data;
+        try {
+            const response = await http.post<Post>("posts", body, {
+                signal: thunkAPI.signal,
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.name === "AxiosError" && error.response?.status === 422) {
+                return thunkAPI.rejectWithValue(error.response.data);
+            }
+            throw error;
+        }
     }
 );
 
@@ -53,10 +61,17 @@ export const updatePost = createAsyncThunk(
     "blog/updatePost",
 
     async ({ postId, body }: { postId: string; body: Post }, thunkAPI) => {
-        const response = await http.put<Post>(`posts/${postId}`, body, {
-            signal: thunkAPI.signal,
-        });
-        return response.data;
+        try {
+            const response = await http.put<Post>(`posts/${postId}`, body, {
+                signal: thunkAPI.signal,
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.name === "AxiosError" && error.response?.status === 422) {
+                return thunkAPI.rejectWithValue(error.response.data);
+            }
+            throw error;
+        }
     }
 );
 

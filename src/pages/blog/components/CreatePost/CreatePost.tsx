@@ -8,6 +8,7 @@ import {
     updatePost,
 } from "../../blog.slice";
 import { RootState, useAppDispatch } from "../../../../store";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 const initialState: Post = {
     id: "",
@@ -17,10 +18,15 @@ const initialState: Post = {
     published: false,
     title: "",
 };
+
+interface ErrorForm {
+    publishDate: string;
+}
+
 export default function CreatePost() {
     const [formData, setFormData] = useState<Post>(initialState);
     const dispatch = useAppDispatch();
-    const loading = useSelector((state: RootState) => state.blog.loading);
+    const [errorForm, setErrorForm] = useState<ErrorForm | null>(null);
     //Edit post
     //Lấy dữ liệu
     const editingPost = useSelector(
@@ -35,17 +41,35 @@ export default function CreatePost() {
         dispatch(cancelEditingPost());
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (editingPost) {
-            dispatch(updatePost({ postId: editingPost.id, body: formData }));
+            dispatch(updatePost({ postId: editingPost.id, body: formData }))
+                // bình thường khi dispatch sẽ đóng gói nên trước khi .then() phải unwrap()
+                // ( mở gói thì mới lấy được dữ liệu ở asyncthunk)
+                .unwrap()
+                .then(() => {
+                    //update thành công thì reset form
+                    setFormData(initialState);
+                    //nếu sau khi có lỗi xong update thành công thì reset errorForm
+                    if (errorForm) setErrorForm(null);
+                })
+                .catch((error) => {
+                    // console.log("error from createPost", error);
+                    setErrorForm(error.error);
+                });
         } else {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { id, ...postData } = formData;
-            dispatch(addPost(postData));
+            try {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { id, ...postData } = formData;
+                const res = await dispatch(addPost(postData)).unwrap();
+                // unwrapResult(res); // unwrapResult sẽ trả về dữ liệu của action tương tự vs unwrap()
+                setFormData(initialState);
+                if (errorForm) setErrorForm(null);
+            } catch (error: any) {
+                setErrorForm(error.error);
+            }
         }
-
-        setFormData(initialState);
     };
 
     return (
@@ -121,14 +145,22 @@ export default function CreatePost() {
             <div className="mb-6">
                 <label
                     htmlFor="publishDate"
-                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300"
+                    className={`mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300 ${
+                        errorForm?.publishDate
+                            ? "text-red-700"
+                            : "text-gray-900"
+                    }`}
                 >
                     Publish Date
                 </label>
                 <input
                     type="datetime-local"
                     id="publishDate"
-                    className="block w-56 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                    className={`block w-56 rounded-lg border p-2.5 text-sm  ${
+                        errorForm?.publishDate
+                            ? "border-red-500 bg-red-50 text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-red-500"
+                            : "border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                    }`}
                     placeholder="Title"
                     required
                     value={formData.publishDate}
@@ -139,6 +171,12 @@ export default function CreatePost() {
                         }))
                     }
                 />
+                {errorForm?.publishDate && (
+                    <p className="mt-2 text-sm text-red-600">
+                        <span className="font-medium">Lỗi! </span>
+                        {errorForm.publishDate}
+                    </p>
+                )}
             </div>
             <div className="mb-6 flex items-center">
                 <input
